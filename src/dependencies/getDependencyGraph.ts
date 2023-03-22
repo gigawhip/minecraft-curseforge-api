@@ -95,5 +95,5 @@ export async function getDependencyGraph(
 
   const rootNode = result[options.mod.slug];
 
-  return rootNode;
+  return rootNode as Required<DependencyGraphNode>;
 }
