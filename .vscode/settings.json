@@ -6,6 +6,6 @@
   "[typescript]": { "editor.defaultFormatter": "denoland.vscode-deno" },
   "markdown.extension.toc.levels": "2..3",
   "markdown.extension.toc.omittedFromToc": {
-    "readme.md": ["## Table of Contents"]
+    "src/readme.md": ["## Table of Contents"]
   }
 }
