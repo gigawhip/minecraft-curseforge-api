@@ -14,7 +14,7 @@ In a Deno project:
 
 <!-- deno-fmt-ignore -->
 ```ts
-import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.1.0/mod.ts";
+import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.2.0/mod.ts";
 
 const curseForge = new CurseForge("YOUR_API_KEY");
 
@@ -38,13 +38,13 @@ import type {
   MinecraftVersion,
   Mod,
   ModLoader,
-} from "https://deno.land/x/minecraft_curseforge_api@0.1.0/mod.ts";
+} from "https://deno.land/x/minecraft_curseforge_api@0.2.0/mod.ts";
 ```
 
 Types are also re-exported under the `CurseForge` namespace, which is merged with the main `CurseForge` class. This allows you to keep your imports very clean, and in more complex files it contextualizes type names for ease of comprehension.
 
 ```ts
-import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.1.0/mod.ts";
+import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.2.0/mod.ts";
 
 const curseForge = new CurseForge("YOUR_API_KEY");
 
@@ -56,7 +56,7 @@ let file: CurseForge.File; // disambiguated from browser File API or other File 
 Additionally, the type of each method's options are nested under the `CurseForge` namespace:
 
 ```ts
-import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.1.0/mod.ts";
+import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.2.0/mod.ts";
 
 const searchOptions: CurseForge.searchMods.Options = {
   // in here, you'll get autocomplete and intellisense for this complex type
@@ -65,10 +65,10 @@ const searchOptions: CurseForge.searchMods.Options = {
 
 ## Complete Example
 
-In this example, we get the popular mod [Quark](https://www.curseforge.com/minecraft/mc-mods/quark), find its newest file for our targeted Minecraft version and mod loader, then fetch all of its dependencies.
+In this example, we get the popular mod [Quark](https://www.curseforge.com/minecraft/mc-mods/quark), find its newest file for our targeted Minecraft version and mod loader, then fetch all of its dependencies. At each stage we check to ensure that the previous operation was successful before proceeding - in this exact example it's not necessary, but if you copy this script and modify the mod slug, mod loader, or minecraft version, these checks will save you!
 
 ```ts
-import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.1.0/mod.ts";
+import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.2.0/mod.ts";
 
 const curseForge = new CurseForge("YOUR_API_KEY");
 
@@ -76,18 +76,41 @@ const modLoader: CurseForge.ModLoader = "Forge";
 const minecraftVersion: CurseForge.MinecraftVersion = "1.19.2";
 
 const mod = await curseForge.getMod("quark");
+
+if (!mod) {
+  console.log("Couldn't find a mod with that slug!");
+  Deno.exit(1);
+}
+
 const file = await curseForge.getNewestFile(
-  quark.id,
+  mod.id,
   { minecraftVersion, modLoader },
 );
 
-const { dependencies } = await curseForge.getDependencyGraph(
+if (!file) {
+  console.log("Couldn't find a file for this mod loader and MC version!");
+  Deno.exit(1);
+}
+
+const graph = await curseForge.getDependencyGraph(
   { file, mod, minecraftVersion, modLoader },
 );
-console.log(Object.keys(dependencies.required)); // ["autoreglib"]
-console.log(dependencies.required.autoreglib);
+
+if (!graph) {
+  console.log("Couldn't make the dependency graph!");
+  console.log(
+    "When you provide both file and mod, this happens if file.modID !== mod.id",
+  );
+  Deno.exit(1);
+}
+
+const { dependencies } = graph;
+console.log(dependencies.required && Object.keys(dependencies.required));
+// [ "autoreglib" ]   Quark's only required dependency
+
+console.log(dependencies.required?.autoreglib);
 // {
-//    mod: Mod,
+//    mod: the AutoRegLib mod object,
 //    file?: newest file matching your criteria, if one was found
 //    dependencies?: that file's dependencies, in the same shape as this
 // }
