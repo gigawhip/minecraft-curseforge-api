@@ -1,5 +1,7 @@
 # Minecraft CurseForge API
 
+[![deno module](https://shield.deno.dev/x/minecraft_curseforge_api)](https://deno.land/x/minecraft_curseforge_api)
+
 An ergonomic Deno wrapper around the NPM package [curseforge-api](https://github.com/Smiley43210/curseforge-api/), tailored just for Minecraft.
 
 ## Usage Documentation
