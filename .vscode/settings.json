@@ -1,0 +1,11 @@
+{
+  "deno.enable": true,
+  "[json]": { "editor.defaultFormatter": "denoland.vscode-deno" },
+  "[jsonc]": { "editor.defaultFormatter": "denoland.vscode-deno" },
+  "[markdown]": { "editor.defaultFormatter": "denoland.vscode-deno" },
+  "[typescript]": { "editor.defaultFormatter": "denoland.vscode-deno" },
+  "markdown.extension.toc.levels": "2..3",
+  "markdown.extension.toc.omittedFromToc": {
+    "readme.md": ["## Table of Contents"]
+  }
+}
