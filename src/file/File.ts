@@ -5,10 +5,7 @@ import {
   MinecraftVersion,
 } from "../common/minecraftVersion.ts";
 import { isModLoader, ModLoader } from "../common/modLoader.ts";
-import {
-  DEPENDENCY_TYPE_NAMES,
-  DependencyTypeName,
-} from "../dependencies/dependencyType.ts";
+import { DEPENDENCY_TYPE_NAMES, DependencyTypeName } from "./dependencyType.ts";
 import { FILE_STATUS_NAMES, FileStatusName } from "./fileStatus.ts";
 import { RELEASE_TYPE_NAMES, ReleaseTypeName } from "./release.ts";
 
