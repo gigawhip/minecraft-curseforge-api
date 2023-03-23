@@ -13,28 +13,35 @@ if (!mod) {
   Deno.exit(1);
 }
 
-const allDeps = await curseForge.getDependenciesDeep({
-  mod,
-  minecraftVersion,
-  modLoader,
-});
+function logDeps(msg: string, result?: Record<string, unknown>) {
+  console.log(msg, Object.keys(result || {}));
+}
 
-console.log("all deps", Object.keys(allDeps || {}));
+logDeps(
+  "all deps",
+  await curseForge.getDependenciesDeep({
+    mod,
+    minecraftVersion,
+    modLoader,
+  }),
+);
 
-const reqDeps = await curseForge.getDependenciesDeep({
-  mod,
-  minecraftVersion,
-  modLoader,
-  include: ["required"],
-});
+logDeps(
+  "include required",
+  await curseForge.getDependenciesDeep({
+    mod,
+    minecraftVersion,
+    modLoader,
+    include: ["required"],
+  }),
+);
 
-console.log("include required", Object.keys(reqDeps || {}));
-
-const otherDeps = await curseForge.getDependenciesDeep({
-  mod,
-  minecraftVersion,
-  modLoader,
-  exclude: ["required"],
-});
-
-console.log("exclude required", Object.keys(otherDeps || {}));
+logDeps(
+  "exclude required",
+  await curseForge.getDependenciesDeep({
+    mod,
+    minecraftVersion,
+    modLoader,
+    exclude: ["required"],
+  }),
+);
