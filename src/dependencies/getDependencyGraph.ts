@@ -1,13 +1,13 @@
 import type { CurseForgeClient } from "https://esm.sh/curseforge-api@1.0.2";
 
-import type { DependencyTypeName } from "./dependencyType.ts";
+import type { VersionAndModLoader } from "../common/types.ts";
 import type { File } from "../file/File.ts";
 import type { Mod } from "../mod/Mod.ts";
-import type { VersionAndModLoader } from "../common/types.ts";
+import type { DependencyTypeName } from "./dependencyType.ts";
 import type { FileOrMod } from "./types.ts";
 
-import { DependencyDict, getDependenciesDeep } from "./getDependenciesDeep.ts";
 import { getMod } from "../mod/getMod.ts";
+import { DependencyDict, getDependenciesDeep } from "./getDependenciesDeep.ts";
 
 export type DependencyGraphNode = {
   mod: Mod;
