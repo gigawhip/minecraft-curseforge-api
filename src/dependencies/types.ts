@@ -9,3 +9,5 @@ export type FileOrMod =
 export type IncludeOrExclude =
   | { include?: DependencyTypeName[]; exclude?: never }
   | { exclude?: DependencyTypeName[]; include?: never };
+
+export type ModSlugsByDepType = Partial<Record<DependencyTypeName, string[]>>;

@@ -4,7 +4,11 @@ import type { VersionAndModLoader } from "../common/types.ts";
 import type { DependencyTypeName } from "../file/dependencyType.ts";
 import type { File } from "../file/File.ts";
 import type { Mod } from "../mod/Mod.ts";
-import type { FileOrMod, IncludeOrExclude } from "./types.ts";
+import type {
+  FileOrMod,
+  IncludeOrExclude,
+  ModSlugsByDepType,
+} from "./types.ts";
 
 import { getNewestFile } from "../file/getNewestFile.ts";
 import { getMod } from "../mod/getMod.ts";
@@ -23,7 +27,7 @@ export type DependencyDict = {
      * When `undefined` or omitted, a file could not be found for the specified
      * Minecraft version and mod loader
      */
-    dependencies?: Partial<Record<DependencyTypeName, string[]>>;
+    dependencies?: ModSlugsByDepType;
   };
 };
 
