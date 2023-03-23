@@ -28,7 +28,7 @@ export type File = {
   server?: true;
   fileFingerprint: number;
   /** Maps dependency types to modIDs. */
-  dependencies: Partial<Record<DependencyTypeName, number[]>>;
+  dependencies: { [K in DependencyTypeName]?: number[] };
   hashes: { sha1: string; md5: string };
   releaseType: ReleaseTypeName;
   fileStatus: FileStatusName;
