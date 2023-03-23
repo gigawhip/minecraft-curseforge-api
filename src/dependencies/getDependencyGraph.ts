@@ -13,45 +13,41 @@ import type {
 import { getMod } from "../mod/getMod.ts";
 import { getDependenciesDeep } from "./getDependenciesDeep.ts";
 
-export type DependencyGraphNode = {
-  mod: Mod;
-  /**
-   * When `undefined` or omitted, a file could not be found for the specified
-   * Minecraft version and mod loader
-   */
-  file?: File;
-  /**
-   * When `undefined` or omitted, a file could not be found for the specified
-   * Minecraft version and mod loader
-   *
-   * @example
-   * { required: {
-   *    someModSlug: { mod: ..., file: ..., dependencies: {} }
-   * } }
-   */
-  dependencies?: Partial<
-    Record<
-      DependencyTypeName,
-      Record<string, DependencyGraphNode>
-    >
-  >;
-};
-
-/** Indexed by mod slug */
-type NormalizedGraph = Record<string, DependencyGraphNode>;
-
 export declare namespace getDependencyGraph {
   export type Options =
     & Required<VersionAndModLoader>
     & FileOrMod
     & IncludeOrExclude;
+
+  export type DependencyGraphNode = {
+    mod: Mod;
+    /**
+     * When `undefined` or omitted, a file could not be found for the specified
+     * Minecraft version and mod loader
+     */
+    file?: File;
+    /**
+     * When `undefined` or omitted, a file could not be found for the specified
+     * Minecraft version and mod loader
+     */
+    dependencies?: {
+      [K in DependencyTypeName]?: { [ModSlug: string]: DependencyGraphNode };
+    };
+  };
+
+  export type Result = Required<DependencyGraphNode>;
 }
 
+type SubGraphNodesByDepType = Exclude<
+  getDependencyGraph.DependencyGraphNode["dependencies"],
+  undefined
+>;
+
 function wireDependencyNodes(
-  nodesBySlug: NormalizedGraph,
+  nodesBySlug: { [ModSlug: string]: getDependencyGraph.DependencyGraphNode },
   dependencies: ModSlugsByDepType,
-): DependencyGraphNode["dependencies"] {
-  const result: DependencyGraphNode["dependencies"] = {};
+): SubGraphNodesByDepType {
+  const result: SubGraphNodesByDepType = {};
 
   const entries = Object
     .entries(dependencies) as Array<[DependencyTypeName, string[]]>;
@@ -82,14 +78,14 @@ function wireDependencyNodes(
 export async function getDependencyGraph(
   curseForge: CurseForgeClient,
   options: getDependencyGraph.Options,
-) {
+): Promise<getDependencyGraph.Result | undefined> {
   options.mod ??= (await getMod(curseForge, options.file!.modID))!;
 
   const dependencyDict = await getDependenciesDeep(curseForge, options);
   if (!dependencyDict) return;
 
   // initializing each result object so that we can wire them to each other
-  const result: Record<string, DependencyGraphNode> = Object
+  const result: Record<string, getDependencyGraph.DependencyGraphNode> = Object
     .fromEntries(
       Object.entries(dependencyDict).map(([slug, { mod }]) => [slug, { mod }]),
     );
@@ -103,5 +99,5 @@ export async function getDependencyGraph(
 
   const rootNode = result[options.mod.slug];
 
-  return rootNode as Required<DependencyGraphNode>;
+  return rootNode as getDependencyGraph.Result;
 }

@@ -13,8 +13,13 @@ import type {
 import { getNewestFile } from "../file/getNewestFile.ts";
 import { getMod } from "../mod/getMod.ts";
 
-export type DependencyDict = {
-  [ModSlug: string]: {
+export declare namespace getDependenciesDeep {
+  export type Options =
+    & Required<VersionAndModLoader>
+    & FileOrMod
+    & IncludeOrExclude;
+
+  export type DependencyGraphNode = {
     mod: Mod;
     /**
      * When `undefined` or omitted, a file could not be found for the specified
@@ -22,20 +27,15 @@ export type DependencyDict = {
      */
     file?: File;
     /**
-     * Maps dependency types (like "required") to an array of mod slugs.
-     *
      * When `undefined` or omitted, a file could not be found for the specified
      * Minecraft version and mod loader
      */
     dependencies?: ModSlugsByDepType;
   };
-};
 
-export declare namespace getDependenciesDeep {
-  export type Options =
-    & Required<VersionAndModLoader>
-    & FileOrMod
-    & IncludeOrExclude;
+  export type DependencyDict = {
+    [ModSlug: string]: DependencyGraphNode;
+  };
 }
 
 function makeInclusionFilter(
@@ -78,7 +78,7 @@ export async function getDependenciesDeep(
   curseForge: CurseForgeClient,
   { file, mod, minecraftVersion, modLoader, include, exclude }:
     getDependenciesDeep.Options,
-) {
+): Promise<getDependenciesDeep.DependencyDict | undefined> {
   if (mod && file && mod.id !== file.modID) return;
 
   mod ??= (await getMod(curseForge, file!.modID))!;
@@ -119,7 +119,7 @@ export async function getDependenciesDeep(
     nodesByModID[mod.id] = { mod, file };
   }
 
-  const result: DependencyDict = {};
+  const result: getDependenciesDeep.DependencyDict = {};
 
   for (const { mod, file } of Object.values(nodesByModID)) {
     result[mod.slug] = { mod };
