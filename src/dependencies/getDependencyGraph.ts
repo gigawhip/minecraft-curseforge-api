@@ -4,7 +4,7 @@ import type { VersionAndModLoader } from "../common/types.ts";
 import type { DependencyTypeName } from "../file/dependencyType.ts";
 import type { File } from "../file/File.ts";
 import type { Mod } from "../mod/Mod.ts";
-import type { FileOrMod } from "./types.ts";
+import type { FileOrMod, IncludeOrExclude } from "./types.ts";
 
 import { getMod } from "../mod/getMod.ts";
 import { DependencyDict, getDependenciesDeep } from "./getDependenciesDeep.ts";
@@ -37,7 +37,10 @@ export type DependencyGraphNode = {
 type NormalizedGraph = Record<string, DependencyGraphNode>;
 
 export declare namespace getDependencyGraph {
-  export type Options = Required<VersionAndModLoader> & FileOrMod;
+  export type Options =
+    & Required<VersionAndModLoader>
+    & FileOrMod
+    & IncludeOrExclude;
 }
 
 function wireDependencyNodes(
