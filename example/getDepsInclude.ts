@@ -14,7 +14,7 @@ if (!mod) {
 }
 
 function logDeps(msg: string, result?: Record<string, unknown>) {
-  console.log(msg, Object.keys(result || {}));
+  console.log(msg, Object.keys(result?.dependencyGraphNodes || {}));
 }
 
 logDeps(

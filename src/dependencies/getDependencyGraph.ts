@@ -81,23 +81,31 @@ export async function getDependencyGraph(
 ): Promise<getDependencyGraph.Result | undefined> {
   options.mod ??= (await getMod(curseForge, options.file!.modID))!;
 
-  const dependencyDict = await getDependenciesDeep(curseForge, options);
-  if (!dependencyDict) return;
+  const results = await getDependenciesDeep(curseForge, options);
+  if (!results) return;
+
+  const { root, dependencyGraphNodes } = results;
 
   // initializing each result object so that we can wire them to each other
-  const result: Record<string, getDependencyGraph.DependencyGraphNode> = Object
+  const nodes: Record<string, getDependencyGraph.DependencyGraphNode> = Object
     .fromEntries(
-      Object.entries(dependencyDict).map(([slug, { mod }]) => [slug, { mod }]),
+      Object
+        .entries(dependencyGraphNodes)
+        .map(([slug, { mod }]) => [slug, { mod }])
+        .concat([[root.mod.slug, { mod: root.mod }]]),
     );
 
-  for (const { mod, file, dependencies } of Object.values(dependencyDict)) {
+  for (
+    const { mod, file, dependencies } of Object.values(dependencyGraphNodes)
+  ) {
     if (!dependencies) continue;
-    result[mod.slug].file = file;
-
-    result[mod.slug].dependencies = wireDependencyNodes(result, dependencies);
+    nodes[mod.slug].file = file;
+    nodes[mod.slug].dependencies = wireDependencyNodes(nodes, dependencies);
   }
 
-  const rootNode = result[options.mod.slug];
-
-  return rootNode as getDependencyGraph.Result;
+  return {
+    mod: root.mod,
+    file: root.file,
+    dependencies: wireDependencyNodes(nodes, root.dependencies),
+  };
 }

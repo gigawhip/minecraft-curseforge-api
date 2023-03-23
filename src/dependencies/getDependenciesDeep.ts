@@ -44,6 +44,11 @@ export declare namespace getDependenciesDeep {
   export type DependencyDict = {
     [ModSlug: string]: DependencyGraphNode;
   };
+
+  export type Result = {
+    root: Required<DependencyGraphNode>;
+    dependencyGraphNodes: DependencyDict;
+  };
 }
 
 function makeInclusionFilter(
@@ -73,12 +78,11 @@ function getDepEntries(
 async function getNodesByModID(
   rootMod: Mod,
   rootFile: File,
+  rootDepEntries: DependencyEntries,
   curseForge: CurseForgeClient,
   shouldInclude: ([depType]: [DependencyTypeName, number[]]) => boolean,
   { minecraftVersion, modLoader }: VersionAndModLoader,
 ) {
-  const rootDepEntries = getDepEntries(rootFile, shouldInclude);
-
   const nodesByModID: RawNodesByModID = {
     [rootMod.id]: { mod: rootMod, file: rootFile, depEntries: rootDepEntries },
   };
@@ -121,10 +125,14 @@ function makeDependencies(
     ]));
 }
 
-function getDependencyGraphNodes(nodesByModID: RawNodesByModID) {
+function getDependencyGraphNodes(nodesByModID: RawNodesByModID, rootMod: Mod) {
   const dependencyGraphNodes: getDependenciesDeep.DependencyDict = {};
 
-  for (const { mod, file, depEntries } of Object.values(nodesByModID)) {
+  const nonRootRawNodes = Object
+    .values(nodesByModID)
+    .filter((node) => node.mod.id !== rootMod.id);
+
+  for (const { mod, file, depEntries } of nonRootRawNodes) {
     dependencyGraphNodes[mod.slug] = { mod };
 
     if (!file) continue;
@@ -153,7 +161,7 @@ export async function getDependenciesDeep(
   curseForge: CurseForgeClient,
   { file, mod, minecraftVersion, modLoader, include, exclude }:
     getDependenciesDeep.Options,
-): Promise<undefined | getDependenciesDeep.DependencyDict> {
+): Promise<getDependenciesDeep.Result | undefined> {
   if (mod && file && mod.id !== file.modID) return;
 
   mod ??= (await getMod(curseForge, file!.modID))!;
@@ -165,13 +173,24 @@ export async function getDependenciesDeep(
 
   if (!file) return;
 
+  const shouldInclude = makeInclusionFilter(include, exclude);
+  const rootDepEntries = getDepEntries(file, shouldInclude);
+
   const nodesByModID = await getNodesByModID(
     mod,
     file,
+    rootDepEntries,
     curseForge,
-    makeInclusionFilter(include, exclude),
+    shouldInclude,
     { minecraftVersion, modLoader },
   );
 
-  return getDependencyGraphNodes(nodesByModID);
+  return {
+    root: {
+      mod,
+      file,
+      dependencies: makeDependencies(rootDepEntries!, nodesByModID),
+    },
+    dependencyGraphNodes: getDependencyGraphNodes(nodesByModID, mod),
+  };
 }
