@@ -13,6 +13,14 @@ import type {
 import { getNewestFile } from "../file/getNewestFile.ts";
 import { getMod } from "../mod/getMod.ts";
 
+type DependencyEntries = Array<[DependencyTypeName, number[]]>;
+
+type RawNodesByModID = Record<number, {
+  mod: Mod;
+  file?: File;
+  depEntries?: DependencyEntries;
+}>;
+
 export declare namespace getDependenciesDeep {
   export type Options =
     & Required<VersionAndModLoader>
@@ -49,17 +57,84 @@ function makeInclusionFilter(
     : (_: [DependencyTypeName, number[]]) => true;
 }
 
-function getModIDs(
-  { dependencies }: File,
-  shouldInclude: ([depType]: [DependencyTypeName, number[]]) => boolean,
-): number[] {
-  const entries = Object
-    .entries(dependencies) as Array<[DependencyTypeName, number[]]>;
+function getModIDs(depEntries: DependencyEntries): number[] {
+  return depEntries.map(([_, modIDs]) => modIDs).flat();
+}
 
-  return entries
-    .filter(shouldInclude)
-    .map(([_, modIDs]) => modIDs)
-    .flat();
+function getDepEntries(
+  file: File,
+  shouldInclude: ([depType]: [DependencyTypeName, number[]]) => boolean,
+): DependencyEntries {
+  const entries = Object.entries(file.dependencies) as DependencyEntries;
+
+  return entries.filter(shouldInclude);
+}
+
+async function getNodesByModID(
+  rootMod: Mod,
+  rootFile: File,
+  curseForge: CurseForgeClient,
+  shouldInclude: ([depType]: [DependencyTypeName, number[]]) => boolean,
+  { minecraftVersion, modLoader }: VersionAndModLoader,
+) {
+  const rootDepEntries = getDepEntries(rootFile, shouldInclude);
+
+  const nodesByModID: RawNodesByModID = {
+    [rootMod.id]: { mod: rootMod, file: rootFile, depEntries: rootDepEntries },
+  };
+
+  const depModIDs = getModIDs(rootDepEntries);
+
+  while (depModIDs.length) {
+    const modID = depModIDs.shift()!;
+
+    if (modID in nodesByModID) continue; // prevent circular lookups
+
+    const mod = (await getMod(curseForge, modID))!;
+    const file = await getNewestFile(curseForge, mod.id, {
+      minecraftVersion,
+      modLoader,
+    });
+
+    if (!file) {
+      nodesByModID[mod.id] = { mod };
+      continue;
+    }
+
+    const depEntries = getDepEntries(file, shouldInclude);
+    depModIDs.push(...getModIDs(depEntries));
+
+    nodesByModID[mod.id] = { mod, file, depEntries };
+  }
+
+  return nodesByModID;
+}
+
+function makeDependencies(
+  entries: DependencyEntries,
+  nodesByModID: RawNodesByModID,
+) {
+  return Object.fromEntries(entries
+    .map(([depType, modIDs]) => [
+      depType,
+      modIDs.map((modID) => nodesByModID[modID].mod.slug),
+    ]));
+}
+
+function getDependencyGraphNodes(nodesByModID: RawNodesByModID) {
+  const dependencyGraphNodes: getDependenciesDeep.DependencyDict = {};
+
+  for (const { mod, file, depEntries } of Object.values(nodesByModID)) {
+    dependencyGraphNodes[mod.slug] = { mod };
+
+    if (!file) continue;
+    dependencyGraphNodes[mod.slug].file = file;
+
+    dependencyGraphNodes[mod.slug]
+      .dependencies = makeDependencies(depEntries!, nodesByModID);
+  }
+
+  return dependencyGraphNodes;
 }
 
 /**
@@ -78,7 +153,7 @@ export async function getDependenciesDeep(
   curseForge: CurseForgeClient,
   { file, mod, minecraftVersion, modLoader, include, exclude }:
     getDependenciesDeep.Options,
-): Promise<getDependenciesDeep.DependencyDict | undefined> {
+): Promise<undefined | getDependenciesDeep.DependencyDict> {
   if (mod && file && mod.id !== file.modID) return;
 
   mod ??= (await getMod(curseForge, file!.modID))!;
@@ -90,56 +165,13 @@ export async function getDependenciesDeep(
 
   if (!file) return;
 
-  const shouldInclude = makeInclusionFilter(include, exclude);
+  const nodesByModID = await getNodesByModID(
+    mod,
+    file,
+    curseForge,
+    makeInclusionFilter(include, exclude),
+    { minecraftVersion, modLoader },
+  );
 
-  const nodesByModID: Record<number, { mod: Mod; file?: File }> = {
-    [mod.id]: { mod, file },
-  };
-
-  const depModIDs = getModIDs(file, shouldInclude);
-
-  while (depModIDs.length) {
-    const modID = depModIDs.shift()!;
-
-    if (modID in nodesByModID) continue; // prevent circular lookups
-
-    const mod = (await getMod(curseForge, modID))!;
-    const file = await getNewestFile(curseForge, mod.id, {
-      minecraftVersion,
-      modLoader,
-    });
-
-    if (!file) {
-      nodesByModID[mod.id] = { mod };
-      continue;
-    }
-
-    depModIDs.push(...getModIDs(file, shouldInclude));
-
-    nodesByModID[mod.id] = { mod, file };
-  }
-
-  const result: getDependenciesDeep.DependencyDict = {};
-
-  for (const { mod, file } of Object.values(nodesByModID)) {
-    result[mod.slug] = { mod };
-
-    if (!file) continue;
-    result[mod.slug].file = file;
-
-    const entries = Object
-      .entries(file.dependencies) as Array<[DependencyTypeName, number[]]>;
-
-    result[mod.slug].dependencies = Object
-      .fromEntries(
-        entries
-          .filter(shouldInclude)
-          .map(([depType, modIDs]) => [
-            depType,
-            modIDs!.map((modID) => nodesByModID[modID].mod.slug),
-          ]),
-      );
-  }
-
-  return result;
+  return getDependencyGraphNodes(nodesByModID);
 }
