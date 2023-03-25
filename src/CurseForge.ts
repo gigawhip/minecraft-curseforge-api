@@ -1,10 +1,10 @@
 import { CurseForgeClient } from "https://esm.sh/curseforge-api@1.0.2";
 
+import type { MinecraftVersion } from "./common/minecraftVersion.ts";
+import type { ModLoader } from "./common/modLoader.ts";
 import type { Pagination, VersionAndModLoader } from "./common/types.ts";
 import type { File } from "./file/File.ts";
 import type { Mod } from "./mod/Mod.ts";
-import type { MinecraftVersion } from "./common/minecraftVersion.ts";
-import type { ModLoader } from "./common/modLoader.ts";
 
 import { Dependencies } from "./file/Dependencies.ts";
 import { getFiles } from "./file/getFiles.ts";
