@@ -13,12 +13,7 @@ async function getModByID(
 ) {
   const result: undefined | CurseForgeMod = await curseForge.getMod(id);
 
-  if (!result) {
-    console.log(`getMod(${id}) | A mod with that ID could not be found.`);
-    return;
-  }
-
-  return mod(result);
+  return result && mod(result);
 }
 
 async function getModBySlug(
