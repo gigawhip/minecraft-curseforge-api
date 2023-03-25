@@ -24,8 +24,14 @@ curseForge.searchMods("vazkii")         // search mod titles and authors
 curseForge.getFiles(modID, options)     // get all files, paginated
 curseForge.getNewestFile(modID, options)
 
-curseForge.getDependenciesDeep(options) // recursively get deps
-curseForge.getDependencyGraph(options)  // get deps in a graph structure
+for await (const dependency of curseForge.dependencies({ file, ...options })) {
+  // do something with dependency
+}
+
+curseForge.dependencies({ file, ...options }).toEntries()
+curseForge.dependencies({ file, ...options }).toObject()
+curseForge.dependencies({ file, ...options }).toMap()
+curseForge.dependencies({ file, ...options }).toGraph()
 ```
 
 ## Type Definitions
@@ -68,7 +74,7 @@ const searchOptions: CurseForge.searchMods.Options = {
 In this example, we get the popular mod [Quark](https://www.curseforge.com/minecraft/mc-mods/quark), find its newest file for our targeted Minecraft version and mod loader, then fetch all of its dependencies. At each stage we check to ensure that the previous operation was successful before proceeding - in this exact example it's not necessary, but if you copy this script and modify the mod slug, mod loader, or minecraft version, these checks will save you!
 
 ```ts
-import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.3.0/mod.ts";
+import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.4.0/mod.ts";
 
 const curseForge = new CurseForge("YOUR_API_KEY");
 
@@ -92,26 +98,10 @@ if (!file) {
   Deno.exit(1);
 }
 
-const graph = await curseForge.getDependencyGraph(
-  { file, mod, minecraftVersion, modLoader },
-);
-
-if (!graph) {
-  console.log("Couldn't make the dependency graph!");
-  console.log(
-    "When you provide both file and mod, this happens if file.modID !== mod.id",
+curseForge
+  .dependencies({ file, minecraftVersion, modLoader })
+  .toFiles()
+  .then((depFiles) =>
+    depFiles.forEach((depFile) => console.log(depFile.displayName))
   );
-  Deno.exit(1);
-}
-
-const { dependencies } = graph;
-console.log(dependencies.required && Object.keys(dependencies.required));
-// [ "autoreglib" ]   Quark's only required dependency
-
-console.log(dependencies.required?.autoreglib);
-// {
-//    mod: the AutoRegLib mod object,
-//    file?: newest file matching your criteria, if one was found
-//    dependencies?: that file's dependencies, in the same shape as this
-// }
 ```

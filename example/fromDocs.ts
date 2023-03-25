@@ -1,4 +1,4 @@
-import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.3.0/mod.ts";
+import { CurseForge } from "../src/CurseForge.ts";
 import { API_KEY } from "./utils/apiKey.ts";
 
 const curseForge = new CurseForge(API_KEY);
@@ -23,25 +23,9 @@ if (!file) {
   Deno.exit(1);
 }
 
-const graph = await curseForge.getDependencyGraph(
-  { file, mod, minecraftVersion, modLoader },
-);
-
-if (!graph) {
-  console.log("Couldn't make the dependency graph!");
-  console.log(
-    "When you provide both file and mod, this happens if file.modID !== mod.id",
+curseForge
+  .dependencies({ file, minecraftVersion, modLoader })
+  .toFiles()
+  .then((depFiles) =>
+    depFiles.forEach((depFile) => console.log(depFile.displayName))
   );
-  Deno.exit(1);
-}
-
-const { dependencies } = graph;
-console.log(dependencies.required && Object.keys(dependencies.required));
-// [ "autoreglib" ]   Quark's only required dependency
-
-console.log(dependencies.required?.autoreglib);
-// {
-//    mod: the AutoRegLib mod object,
-//    file?: newest file matching your criteria, if one was found
-//    dependencies?: that file's dependencies, in the same shape as this
-// }

@@ -13,35 +13,44 @@ if (!mod) {
   Deno.exit(1);
 }
 
-function logDeps(msg: string, result?: Record<string, unknown>) {
-  console.log(msg, Object.keys(result?.dependencyGraphNodes || {}));
+const file = await curseForge.getNewestFile(
+  mod.id,
+  { minecraftVersion, modLoader },
+);
+
+if (!file) {
+  console.log(
+    `Couldn't find a file for ${mod.name}} (${minecraftVersion} ${modLoader})`,
+  );
+  Deno.exit(1);
+}
+
+function logDeps(msg: string, depMap: Map<number, CurseForge.File | null>) {
+  console.log(
+    msg,
+    [...depMap.values()]
+      .filter((file): file is CurseForge.File => file !== null)
+      .map((file) => file!.displayName),
+  );
 }
 
 logDeps(
   "all deps",
-  await curseForge.getDependenciesDeep({
-    mod,
-    minecraftVersion,
-    modLoader,
-  }),
+  await curseForge
+    .dependencies({ file, minecraftVersion, modLoader })
+    .toMap(),
 );
 
 logDeps(
   "include required",
-  await curseForge.getDependenciesDeep({
-    mod,
-    minecraftVersion,
-    modLoader,
-    include: ["required"],
-  }),
+  await curseForge
+    .dependencies({ file, minecraftVersion, modLoader, include: ["required"] })
+    .toMap(),
 );
 
 logDeps(
   "exclude required",
-  await curseForge.getDependenciesDeep({
-    mod,
-    minecraftVersion,
-    modLoader,
-    exclude: ["required"],
-  }),
+  await curseForge
+    .dependencies({ file, minecraftVersion, modLoader, exclude: ["required"] })
+    .toMap(),
 );
