@@ -42,18 +42,14 @@ export class CurseForge {
     query: string,
     options?: CurseForge.searchMods.Options,
   ) {
-    const result = await searchMods(this.#client, query, options);
-
-    return result;
+    return await searchMods(this.#client, query, options);
   }
 
   async getFiles(
     modID: number,
     options?: Pagination & VersionAndModLoader,
   ) {
-    const result = await getFiles(this.#client, modID, options);
-
-    return result;
+    return await getFiles(this.#client, modID, options);
   }
 
   async getNewestFile(modID: number, options?: VersionAndModLoader) {
