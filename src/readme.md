@@ -61,7 +61,7 @@ let file: CurseForge.File; // disambiguated from browser File API or other File 
 
 ## Complete Example
 
-In this example, we get the popular mod [Quark](https://www.curseforge.com/minecraft/mc-mods/quark), find its newest file for our targeted Minecraft version and mod loader, then fetch all of its dependencies. At each stage we check to ensure that the previous operation was successful before proceeding - in this exact example it's not necessary, but if you copy this script and modify the mod slug, mod loader, or minecraft version, these checks will save you!
+In this example, we get the popular mod [Quark](https://www.curseforge.com/minecraft/mc-mods/quark), find its newest file for our targeted Minecraft version and mod loader, then fetch all of its required dependencies. At each stage we check to ensure that the previous operation was successful before proceeding - in this exact example it's not necessary, but if you copy this script and modify the mod slug, mod loader, or minecraft version, these checks will save you!
 
 ```ts
 import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.4.0/mod.ts";
@@ -86,7 +86,7 @@ if (!file) {
 }
 
 curseForge
-  .dependencies({ file, minecraftVersion, modLoader })
+  .dependencies({ file, minecraftVersion, modLoader, include: ["required"] })
   .toFiles()
   .then((depFiles) =>
     depFiles.forEach((depFile) => console.log(depFile.displayName))

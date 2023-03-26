@@ -21,7 +21,7 @@ if (!file) {
 }
 
 curseForge
-  .dependencies({ file, minecraftVersion, modLoader })
+  .dependencies({ file, minecraftVersion, modLoader, include: ["required"] })
   .toFiles()
   .then((depFiles) =>
     depFiles.forEach((depFile) => console.log(depFile.displayName))
