@@ -1,11 +1,13 @@
 import {
   CurseForgeClient,
   CurseForgeModLoaderType,
+  CurseForgeModsSearchSortField,
+  CurseForgeSortOrder,
 } from "https://esm.sh/curseforge-api@1.0.2";
 
 import type { Cache } from "../Cache.ts";
 import type { Pagination, VersionAndModLoader } from "../common/types.ts";
-import type { SearchSortField } from "./sortField.ts";
+import { SearchSortField } from "./sortField.ts";
 
 import { CLASSES, MOD_CATEGORIES, ModCategory } from "../common/categories.ts";
 import { GAME_ID } from "../common/constants.ts";
@@ -35,7 +37,14 @@ export async function searchMods(
   const query = cache.queryString(searchString, options);
   if (cache.mods[query]) return cache.mods[query];
 
-  const { minecraftVersion, modLoader, category, ...opts } = options;
+  const {
+    minecraftVersion,
+    modLoader,
+    sortField,
+    sortOrder,
+    category,
+    ...opts
+  } = options;
 
   const { pagination, data: _data } = await curseForge
     .searchMods(
@@ -46,6 +55,8 @@ export async function searchMods(
         categoryId: category && MOD_CATEGORIES[category],
         modLoaderType: modLoader && CurseForgeModLoaderType[modLoader],
         searchFilter: searchString,
+        sortField: sortField && CurseForgeModsSearchSortField[sortField],
+        sortOrder: sortOrder as CurseForgeSortOrder,
         ...opts,
       }),
     );
