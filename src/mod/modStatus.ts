@@ -1,4 +1,4 @@
-export const MOD_STATUS_NAMES = {
+export const MOD_STATUSES = {
   1: "New",
   2: "ChangesRequired",
   3: "UnderSoftReview",
@@ -11,6 +11,6 @@ export const MOD_STATUS_NAMES = {
   10: "UnderReview",
 } as const;
 
-type T = typeof MOD_STATUS_NAMES;
+type T = typeof MOD_STATUSES;
 
-export type ModStatusName = T[keyof T];
+export type ModStatus = T[keyof T];

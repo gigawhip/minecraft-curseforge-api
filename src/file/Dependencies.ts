@@ -1,22 +1,22 @@
 import type { CurseForgeClient } from "https://esm.sh/curseforge-api@1.0.2";
 
 import type { VersionAndModLoader } from "../common/types.ts";
-import type { DependencyTypeName } from "../file/dependencyType.ts";
+import type { DependencyType } from "../file/dependencyType.ts";
 import type { File } from "../file/File.ts";
 
 import { getNewestFile } from "../file/getNewestFile.ts";
 
-type InclusionFilter = (depType: DependencyTypeName) => boolean;
+type InclusionFilter = (depType: DependencyType) => boolean;
 
 function makeInclusionFilter(
-  include?: DependencyTypeName[],
-  exclude?: DependencyTypeName[],
+  include?: DependencyType[],
+  exclude?: DependencyType[],
 ): InclusionFilter {
   return include
-    ? (depType: DependencyTypeName) => include.includes(depType)
+    ? (depType: DependencyType) => include.includes(depType)
     : exclude
-    ? (depType: DependencyTypeName) => !exclude.includes(depType)
-    : (_: DependencyTypeName) => true;
+    ? (depType: DependencyType) => !exclude.includes(depType)
+    : (_: DependencyType) => true;
 }
 
 function getModIDs(
@@ -27,7 +27,7 @@ function getModIDs(
   const result: number[] = [];
 
   for (const key in file.dependencies) {
-    const depType = key as DependencyTypeName;
+    const depType = key as DependencyType;
     if (!shouldInclude(depType)) continue;
 
     const modIDs = file.dependencies[depType] || [];
@@ -43,15 +43,15 @@ function getModIDs(
 
 export declare namespace Dependencies {
   type IncludeOrExclude =
-    | { include?: DependencyTypeName[]; exclude?: never }
-    | { exclude?: DependencyTypeName[]; include?: never };
+    | { include?: DependencyType[]; exclude?: never }
+    | { exclude?: DependencyType[]; include?: never };
 
   export type Options = VersionAndModLoader & IncludeOrExclude & { file: File };
 
   export type GraphNode = {
     file: File;
     dependencies: {
-      [K in DependencyTypeName]?: {
+      [K in DependencyType]?: {
         [modID: number]: GraphNode | null;
       };
     };
@@ -147,7 +147,7 @@ export class Dependencies {
       if (!node) continue;
 
       for (const key in node.file.dependencies) {
-        const depType = key as DependencyTypeName;
+        const depType = key as DependencyType;
 
         const depModIDs = node.file.dependencies[depType];
         if (!depModIDs) continue;

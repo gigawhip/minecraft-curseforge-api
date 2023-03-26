@@ -5,9 +5,9 @@ import {
   MinecraftVersion,
 } from "../common/minecraftVersion.ts";
 import { isModLoader, ModLoader } from "../common/modLoader.ts";
-import { DEPENDENCY_TYPE_NAMES, DependencyTypeName } from "./dependencyType.ts";
-import { FILE_STATUS_NAMES, FileStatusName } from "./fileStatus.ts";
-import { RELEASE_TYPE_NAMES, ReleaseTypeName } from "./release.ts";
+import { DEPENDENCY_TYPES, DependencyType } from "./dependencyType.ts";
+import { FILE_STATUSES, FileStatus } from "./fileStatus.ts";
+import { RELEASE_TYPES, ReleaseType } from "./release.ts";
 
 export type File = {
   id: number;
@@ -28,10 +28,10 @@ export type File = {
   server?: true;
   fileFingerprint: number;
   /** Maps dependency types to modIDs. */
-  dependencies: { [K in DependencyTypeName]?: number[] };
+  dependencies: { [K in DependencyType]?: number[] };
   hashes: { sha1: string; md5: string };
-  releaseType: ReleaseTypeName;
-  fileStatus: FileStatusName;
+  releaseType: ReleaseType;
+  fileStatus: FileStatus;
   modules: Record<string, number>;
 };
 
@@ -67,9 +67,9 @@ export function file(
     length,
     fileFingerprint,
     hashes: { sha1: hashes[0].value, md5: hashes[1].value },
-    releaseType: RELEASE_TYPE_NAMES[releaseType],
+    releaseType: RELEASE_TYPES[releaseType],
     dependencies: dependencies.reduce((depMap, { modId, relationType }) => {
-      const relationTypeName = DEPENDENCY_TYPE_NAMES[relationType];
+      const relationTypeName = DEPENDENCY_TYPES[relationType];
 
       if (!(relationTypeName in depMap)) depMap[relationTypeName] = [];
 
@@ -77,7 +77,7 @@ export function file(
 
       return depMap;
     }, {} as File["dependencies"]),
-    fileStatus: FILE_STATUS_NAMES[fileStatus],
+    fileStatus: FILE_STATUSES[fileStatus],
     modules: Object.fromEntries(modules.map((m) => [m.name, m.fingerprint])),
     minecraftVersions: gameVersions.filter(isMinecraftVersion),
     modLoaders: gameVersions.filter(isModLoader) || ["Any"],

@@ -1,4 +1,4 @@
-export const DEPENDENCY_TYPE_NAMES = {
+export const DEPENDENCY_TYPES = {
   1: "embeddedLibrary",
   2: "optional",
   3: "required",
@@ -7,6 +7,6 @@ export const DEPENDENCY_TYPE_NAMES = {
   6: "include",
 } as const;
 
-type T = typeof DEPENDENCY_TYPE_NAMES;
+type T = typeof DEPENDENCY_TYPES;
 
-export type DependencyTypeName = T[keyof T];
+export type DependencyType = T[keyof T];

@@ -1,10 +1,13 @@
 import { CurseForgeClient } from "https://esm.sh/curseforge-api@1.0.2";
 
+import type { Category } from "./common/categories.ts";
 import type { MinecraftVersion } from "./common/minecraftVersion.ts";
 import type { ModLoader } from "./common/modLoader.ts";
 import type { Pagination, VersionAndModLoader } from "./common/types.ts";
+import type { DependencyType } from "./file/dependencyType.ts";
 import type { File } from "./file/File.ts";
 import type { Mod } from "./mod/Mod.ts";
+import type { SearchSortField } from "./mod/sortField.ts";
 
 import { Dependencies } from "./file/Dependencies.ts";
 import { getFiles } from "./file/getFiles.ts";
@@ -14,7 +17,9 @@ import { searchMods } from "./mod/searchMods.ts";
 
 export declare namespace CurseForge {
   export {
+    Category,
     Dependencies,
+    DependencyType,
     File,
     getFiles,
     getNewestFile,
@@ -23,6 +28,7 @@ export declare namespace CurseForge {
     Mod,
     ModLoader,
     searchMods,
+    SearchSortField,
   };
 }
 
