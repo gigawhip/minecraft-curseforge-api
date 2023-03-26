@@ -4,15 +4,13 @@ import type { VersionAndModLoader } from "../common/types.ts";
 
 import { getFiles } from "./getFiles.ts";
 
-export declare namespace getNewestFile {
-  export type Options = VersionAndModLoader;
-}
+export type GetNewestFileOptions = VersionAndModLoader;
 
 /** @private Use CurseForge.getNewestFile() instead. */
 export async function getNewestFile(
   curseForge: CurseForgeClient,
   modID: number,
-  options?: getNewestFile.Options,
+  options?: GetNewestFileOptions,
 ) {
   const result = await getFiles(curseForge, modID, options);
 

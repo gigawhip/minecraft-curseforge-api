@@ -41,22 +41,23 @@ function getModIDs(
   return result;
 }
 
-export declare namespace Dependencies {
-  type IncludeOrExclude =
-    | { include?: DependencyType[]; exclude?: never }
-    | { exclude?: DependencyType[]; include?: never };
+type IncludeOrExclude =
+  | { include?: DependencyType[]; exclude?: never }
+  | { exclude?: DependencyType[]; include?: never };
 
-  export type Options = VersionAndModLoader & IncludeOrExclude & { file: File };
+export type DependenciesOptions =
+  & VersionAndModLoader
+  & IncludeOrExclude
+  & { file: File };
 
-  export type GraphNode = {
-    file: File;
-    dependencies: {
-      [K in DependencyType]?: {
-        [modID: number]: GraphNode | null;
-      };
+export type DependencyGraphNode = {
+  file: File;
+  dependencies: {
+    [K in DependencyType]?: {
+      [modID: number]: DependencyGraphNode | null;
     };
   };
-}
+};
 
 export class Dependencies {
   #inclusionFilter: InclusionFilter;
@@ -64,7 +65,7 @@ export class Dependencies {
   /** @private Use CurseForge.dependencies() instead. */
   constructor(
     private curseForge: CurseForgeClient,
-    public readonly options: Dependencies.Options,
+    public readonly options: DependenciesOptions,
   ) {
     this.#inclusionFilter = makeInclusionFilter(
       options.include,
@@ -112,10 +113,10 @@ export class Dependencies {
     return files;
   }
 
-  async #graphNodesByModID(rootNode: Dependencies.GraphNode) {
+  async #graphNodesByModID(rootNode: DependencyGraphNode) {
     const filesByModID = await this.toObject();
 
-    const nodesByModID: Record<number, Dependencies.GraphNode | null> = {};
+    const nodesByModID: Record<number, DependencyGraphNode | null> = {};
 
     for (const key in filesByModID) {
       const modID = Number(key);
@@ -133,7 +134,7 @@ export class Dependencies {
   }
 
   async toGraph() {
-    const rootNode: Dependencies.GraphNode = {
+    const rootNode: DependencyGraphNode = {
       file: this.options.file,
       dependencies: {},
     };

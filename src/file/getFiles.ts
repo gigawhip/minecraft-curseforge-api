@@ -8,15 +8,13 @@ import type { Pagination, VersionAndModLoader } from "../common/types.ts";
 import { removeUndefinedProperties } from "../common/utils.ts";
 import { file } from "./File.ts";
 
-export declare namespace getFiles {
-  export type Options = Pagination & VersionAndModLoader;
-}
+export type GetFilesOptions = Pagination & VersionAndModLoader;
 
 /** @private Use CurseForge.getFiles() instead. */
 export async function getFiles(
   curseForge: CurseForgeClient,
   modID: number,
-  options: getFiles.Options = {},
+  options: GetFilesOptions = {},
 ) {
   const { minecraftVersion, modLoader, index, pageSize } = options;
 

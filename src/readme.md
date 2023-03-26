@@ -59,16 +59,6 @@ const modLoader: CurseForge.ModLoader = "Forge"; // easy access
 let file: CurseForge.File; // disambiguated from browser File API or other File types
 ```
 
-Additionally, the type of each method's options are nested under the `CurseForge` namespace:
-
-```ts
-import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.3.0/mod.ts";
-
-const searchOptions: CurseForge.searchMods.Options = {
-  // in here, you'll get autocomplete and intellisense for this complex type
-};
-```
-
 ## Complete Example
 
 In this example, we get the popular mod [Quark](https://www.curseforge.com/minecraft/mc-mods/quark), find its newest file for our targeted Minecraft version and mod loader, then fetch all of its dependencies. At each stage we check to ensure that the previous operation was successful before proceeding - in this exact example it's not necessary, but if you copy this script and modify the mod slug, mod loader, or minecraft version, these checks will save you!
