@@ -11,16 +11,14 @@ import { GAME_ID } from "../common/constants.ts";
 import { removeUndefinedProperties } from "../common/utils.ts";
 import { mod } from "./Mod.ts";
 
-export declare namespace searchMods {
-  export type Options =
-    & Pagination
-    & VersionAndModLoader
-    & {
-      category?: ModCategory;
-      sortField?: SearchSortField;
-      sortOrder?: "asc" | "desc";
-    };
-}
+export type SearchModsOptions =
+  & Pagination
+  & VersionAndModLoader
+  & {
+    category?: ModCategory;
+    sortField?: SearchSortField;
+    sortOrder?: "asc" | "desc";
+  };
 
 /**
  * @private Use CurseForge.getMod() instead.
@@ -30,8 +28,7 @@ export declare namespace searchMods {
 export async function searchMods(
   curseForge: CurseForgeClient,
   query: string,
-  { minecraftVersion, modLoader, category, ...options }: searchMods.Options =
-    {},
+  { minecraftVersion, modLoader, category, ...options }: SearchModsOptions = {},
 ) {
   const { pagination, data: _data } = await curseForge
     .searchMods(
