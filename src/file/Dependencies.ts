@@ -1,5 +1,6 @@
 import type { CurseForgeClient } from "https://esm.sh/curseforge-api@1.0.2";
 
+import type { Cache } from "../Cache.ts";
 import type { VersionAndModLoader } from "../common/types.ts";
 import type { DependencyType } from "../file/dependencyType.ts";
 import type { File } from "../file/File.ts";
@@ -65,6 +66,7 @@ export class Dependencies {
   /** @private Use CurseForge.dependencies() instead. */
   constructor(
     private curseForge: CurseForgeClient,
+    private cache: Cache,
     public readonly options: DependenciesOptions,
   ) {
     this.#inclusionFilter = makeInclusionFilter(
@@ -174,6 +176,7 @@ export class Dependencies {
 
       const file = await getNewestFile(
         this.curseForge,
+        this.cache,
         modID,
         {
           minecraftVersion: this.options.minecraftVersion,
