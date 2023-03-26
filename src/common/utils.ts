@@ -4,6 +4,6 @@
  */
 export function removeUndefinedProperties<T extends Record<string, unknown>>(
   input: T,
-) {
+): T {
   return JSON.parse(JSON.stringify(input));
 }
