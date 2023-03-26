@@ -13,7 +13,7 @@ async function getModByID(
 ) {
   const result: undefined | CurseForgeMod = await curseForge.getMod(id);
 
-  return result && mod(result);
+  return result ? mod(result) : null;
 }
 
 async function getModBySlug(
@@ -26,7 +26,7 @@ async function getModBySlug(
       classId: CLASSES.Mods,
     });
 
-  if (data.length !== 1) return;
+  if (data.length !== 1) return null;
 
   return mod(data[0]);
 }

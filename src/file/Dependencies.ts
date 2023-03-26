@@ -181,14 +181,9 @@ export class Dependencies {
         },
       );
 
-      if (!file) {
-        yield { modID, file: null };
-        continue;
-      }
-
       yield { modID, file };
 
-      queue.push(...getModIDs(file, this.#inclusionFilter, seen));
+      if (file) queue.push(...getModIDs(file, this.#inclusionFilter, seen));
     }
   }
 }
