@@ -1,4 +1,4 @@
-import { CurseForge } from "../src/CurseForge.ts";
+import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.4.0/mod.ts";
 import { API_KEY } from "./utils/apiKey.ts";
 
 const curseForge = new CurseForge(API_KEY);
