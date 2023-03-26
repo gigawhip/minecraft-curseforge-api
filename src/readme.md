@@ -14,7 +14,7 @@ An ergonomic Deno wrapper around the NPM package [curseforge-api](https://github
 In a Deno project:
 
 ```ts
-import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.3.0/mod.ts";
+import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.4.0/mod.ts";
 
 const curseForge = new CurseForge("YOUR_API_KEY");
 
@@ -48,13 +48,13 @@ import type {
   MinecraftVersion,
   Mod,
   ModLoader,
-} from "https://deno.land/x/minecraft_curseforge_api@0.3.0/mod.ts";
+} from "https://deno.land/x/minecraft_curseforge_api@0.4.0/mod.ts";
 ```
 
 Types are also re-exported under the `CurseForge` namespace, which is merged with the main `CurseForge` class. This allows you to keep your imports very clean, and in more complex files it contextualizes type names for ease of comprehension.
 
 ```ts
-import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.3.0/mod.ts";
+import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.4.0/mod.ts";
 
 const curseForge = new CurseForge("YOUR_API_KEY");
 
