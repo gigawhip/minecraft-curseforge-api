@@ -13,26 +13,29 @@ An ergonomic Deno wrapper around the NPM package [curseforge-api](https://github
 
 In a Deno project:
 
-<!-- deno-fmt-ignore -->
 ```ts
 import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.3.0/mod.ts";
 
 const curseForge = new CurseForge("YOUR_API_KEY");
 
-curseForge.getMod("jei")                // get mod by slug or ID #
-curseForge.searchMods("vazkii")         // search mod titles and authors
+await curseForge.getMod(slugOrID);
+await curseForge.searchMods(nameOrAuthor, options);
+await curseForge.getFiles(modID, options);
+await curseForge.getNewestFile(modID, options);
 
-curseForge.getFiles(modID, options)     // get all files, paginated
-curseForge.getNewestFile(modID, options)
+const dependencies = curseForge
+  .dependencies({ file, minecraftVersion, modLoader, ...options });
 
 for await (const dependency of curseForge.dependencies({ file, ...options })) {
   // do something with dependency
 }
 
-curseForge.dependencies({ file, ...options }).toEntries()
-curseForge.dependencies({ file, ...options }).toObject()
-curseForge.dependencies({ file, ...options }).toMap()
-curseForge.dependencies({ file, ...options }).toGraph()
+// helper methods
+await dependencies.toEntries();
+await dependencies.toObject();
+await dependencies.toFiles();
+await dependencies.toMap();
+await dependencies.toGraph();
 ```
 
 ## Type Definitions
