@@ -14,7 +14,7 @@ export async function getNewestFile(
 ) {
   const result = await getFiles(curseForge, modID, options);
 
-  if (result.data.length === 0) return;
+  if (result.data.length === 0) return null;
 
   return result.data[0];
 }
