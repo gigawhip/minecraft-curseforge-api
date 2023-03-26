@@ -67,7 +67,6 @@ In this example, we get the popular mod [Quark](https://www.curseforge.com/minec
 import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.4.0/mod.ts";
 
 const curseForge = new CurseForge("YOUR_API_KEY");
-
 const modLoader: CurseForge.ModLoader = "Forge";
 const minecraftVersion: CurseForge.MinecraftVersion = "1.19.2";
 
@@ -78,10 +77,8 @@ if (!mod) {
   Deno.exit(1);
 }
 
-const file = await curseForge.getNewestFile(
-  mod.id,
-  { minecraftVersion, modLoader },
-);
+const file = await curseForge
+  .getNewestFile(mod.id, { minecraftVersion, modLoader });
 
 if (!file) {
   console.log("Couldn't find a file for this mod loader and MC version!");
