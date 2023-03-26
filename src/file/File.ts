@@ -7,7 +7,7 @@ import {
 import { isModLoader, ModLoader } from "../common/modLoader.ts";
 import { DEPENDENCY_TYPES, DependencyType } from "./dependencyType.ts";
 import { FILE_STATUSES, FileStatus } from "./fileStatus.ts";
-import { RELEASE_TYPES, ReleaseType } from "./release.ts";
+import { RELEASE_TYPES, ReleaseType } from "./releaseType.ts";
 
 export type File = {
   id: number;
