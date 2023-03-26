@@ -1,4 +1,4 @@
-export const FILE_STATUS_NAMES = {
+export const FILE_STATUSES = {
   1: "Processing",
   2: "ChangesRequired",
   3: "UnderReview",
@@ -16,6 +16,6 @@ export const FILE_STATUS_NAMES = {
   15: "FailedPublishing",
 } as const;
 
-type T = typeof FILE_STATUS_NAMES;
+type T = typeof FILE_STATUSES;
 
-export type FileStatusName = T[keyof T];
+export type FileStatus = T[keyof T];

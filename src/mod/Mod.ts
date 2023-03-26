@@ -1,8 +1,8 @@
 import type { CurseForgeMod } from "https://esm.sh/curseforge-api@1.0.2";
 
-import type { ModCategoryName } from "../common/categories.ts";
+import type { ModCategory } from "../common/categories.ts";
 
-import { MOD_STATUS_NAMES, ModStatusName } from "./modStatus.ts";
+import { MOD_STATUSES, ModStatus } from "./modStatus.ts";
 
 export type Mod = {
   id: number;
@@ -15,11 +15,11 @@ export type Mod = {
     issuesUrl?: string;
     sourceUrl?: string;
   };
-  status: ModStatusName;
+  status: ModStatus;
   downloadCount: number;
   isFeatured: boolean;
-  primaryCategory: ModCategoryName;
-  categories: ModCategoryName[];
+  primaryCategory: ModCategory;
+  categories: ModCategory[];
   authors: Array<{
     id: number;
     name: string;
@@ -71,12 +71,12 @@ export function mod({
       Object.entries(links)
         .filter(([_, url]) => url),
     ),
-    status: MOD_STATUS_NAMES[status],
+    status: MOD_STATUSES[status],
     downloadCount,
     isFeatured,
     primaryCategory: categories.find((cat) => cat.id === primaryCategoryId)!
-      .name as ModCategoryName,
-    categories: categories.map((cat) => cat.name as ModCategoryName),
+      .name as ModCategory,
+    categories: categories.map((cat) => cat.name as ModCategory),
     authors,
     logo: {
       thumbnailUrl: logo.thumbnailUrl,

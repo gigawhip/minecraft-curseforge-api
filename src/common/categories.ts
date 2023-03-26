@@ -15,7 +15,7 @@ export async function getClasses(client: CurseForgeClient) {
  * CurseForge's term for top-level entity types like mod vs modpack vs
  * resource pack
  */
-export const CLASS_NAMES = {
+export const CLASSES = {
   Customization: 4546,
   Modpacks: 4471,
   "Bukkit Plugins": 5,
@@ -25,15 +25,15 @@ export const CLASS_NAMES = {
   Mods: 6,
 } as const;
 
-export type ClassName = keyof typeof CLASS_NAMES;
+export type Class = keyof typeof CLASSES;
 
 async function _getCategoriesByClassName(
   client: CurseForgeClient,
-  className: ClassName,
+  className: Class,
 ) {
   return Object.fromEntries(
     (await client.getCategories(GAME_ID, {
-      classId: CLASS_NAMES[className],
+      classId: CLASSES[className],
     }))
       .map(({ name, id }) => [name, id]),
   );
@@ -89,7 +89,7 @@ export const MOD_CATEGORIES = {
   Skyblock: 6145,
 } as const;
 
-export type ModCategoryName = keyof typeof MOD_CATEGORIES;
+export type ModCategory = keyof typeof MOD_CATEGORIES;
 
 /** Generate the constant MODPACK_CATEGORIES exported below */
 export async function getModpackCategories(client: CurseForgeClient) {
@@ -115,7 +115,7 @@ export const MODPACK_CATEGORIES = {
   "FTB Official Pack": 4487,
 } as const;
 
-export type ModpackCategoryName = keyof typeof MODPACK_CATEGORIES;
+export type ModpackCategory = keyof typeof MODPACK_CATEGORIES;
 
 /** Generate the constant RESOURCE_PACK_CATEGORIES exported below */
 export async function getResourcePackCategories(client: CurseForgeClient) {
@@ -141,7 +141,7 @@ export const RESOURCE_PACK_CATEGORIES = {
   Modern: 401,
 } as const;
 
-export type ResourcePackCategoryName = keyof typeof RESOURCE_PACK_CATEGORIES;
+export type ResourcePackCategory = keyof typeof RESOURCE_PACK_CATEGORIES;
 
 /** Generate the constant CUSTOMIZATION_CATEGORIES exported below */
 export async function getCustomizationCategories(client: CurseForgeClient) {
@@ -163,20 +163,20 @@ export const CUSTOMIZATION_CATEGORIES = {
   Scripts: 4552,
 } as const;
 
-export type CustomizationCategoryName = keyof typeof CUSTOMIZATION_CATEGORIES;
+export type CustomizationCategory = keyof typeof CUSTOMIZATION_CATEGORIES;
 
 /** Generate the constant ADDON_CATEGORIES exported below */
 export async function getAddonCategories(client: CurseForgeClient) {
   return await _getCategoriesByClassName(client, "Addons");
 }
 
-export type AddonCategoryName = keyof typeof ADDON_CATEGORIES;
-
 export const ADDON_CATEGORIES = {
   Worlds: 4560,
   "Resource Packs": 4561,
   Scenarios: 4562,
 } as const;
+
+export type AddonCategory = keyof typeof ADDON_CATEGORIES;
 
 /** Generate the constant BUKKIT_PLUGIN_CATEGORIES exported below */
 export async function getBukkitPluginCategories(client: CurseForgeClient) {
@@ -203,7 +203,7 @@ export const BUKKIT_PLUGIN_CATEGORIES = {
   Informational: 128,
 } as const;
 
-export type BukkitPluginCategoryName = keyof typeof BUKKIT_PLUGIN_CATEGORIES;
+export type BukkitPluginCategory = keyof typeof BUKKIT_PLUGIN_CATEGORIES;
 
 /** Generate the constant WORLD_CATEGORIES exported below */
 export async function getWorldCategories(client: CurseForgeClient) {
@@ -220,4 +220,14 @@ export const WORLD_CATEGORIES = {
   Puzzle: 252,
 } as const;
 
-export type WorldCategoryName = keyof typeof WORLD_CATEGORIES;
+export type WorldCategory = keyof typeof WORLD_CATEGORIES;
+
+export declare namespace Category {
+  export type Mod = ModCategory;
+  export type Modpack = ModpackCategory;
+  export type ResourcePack = ResourcePackCategory;
+  export type Customization = CustomizationCategory;
+  export type Addon = AddonCategory;
+  export type BukkitPlugin = BukkitPluginCategory;
+  export type World = WorldCategory;
+}

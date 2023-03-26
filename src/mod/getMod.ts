@@ -3,7 +3,7 @@ import type {
   CurseForgeMod,
 } from "https://esm.sh/curseforge-api@1.0.2";
 
-import { CLASS_NAMES } from "../common/categories.ts";
+import { CLASSES } from "../common/categories.ts";
 import { GAME_ID } from "../common/constants.ts";
 import { mod } from "./Mod.ts";
 
@@ -23,7 +23,7 @@ async function getModBySlug(
   const { data } = await curseForge
     .searchMods(GAME_ID, {
       slug,
-      classId: CLASS_NAMES.Mods,
+      classId: CLASSES.Mods,
     });
 
   if (data.length !== 1) return;

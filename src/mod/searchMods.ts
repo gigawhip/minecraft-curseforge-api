@@ -4,13 +4,9 @@ import {
 } from "https://esm.sh/curseforge-api@1.0.2";
 
 import type { Pagination, VersionAndModLoader } from "../common/types.ts";
-import type { SortFieldName } from "./sortField.ts";
+import type { SearchSortField } from "./sortField.ts";
 
-import {
-  CLASS_NAMES,
-  MOD_CATEGORIES,
-  ModCategoryName,
-} from "../common/categories.ts";
+import { CLASSES, MOD_CATEGORIES, ModCategory } from "../common/categories.ts";
 import { GAME_ID } from "../common/constants.ts";
 import { removeUndefinedProperties } from "../common/utils.ts";
 import { mod } from "./Mod.ts";
@@ -20,8 +16,8 @@ export declare namespace searchMods {
     & Pagination
     & VersionAndModLoader
     & {
-      category?: ModCategoryName;
-      sortField?: SortFieldName;
+      category?: ModCategory;
+      sortField?: SearchSortField;
       sortOrder?: "asc" | "desc";
     };
 }
@@ -41,7 +37,7 @@ export async function searchMods(
     .searchMods(
       GAME_ID,
       removeUndefinedProperties({
-        classId: CLASS_NAMES.Mods,
+        classId: CLASSES.Mods,
         gameVersion: minecraftVersion,
         categoryId: category && MOD_CATEGORIES[category],
         modLoaderType: modLoader && CurseForgeModLoaderType[modLoader],

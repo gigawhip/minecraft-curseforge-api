@@ -1,4 +1,4 @@
-export const SORT_FIELD_NAMES = {
+export const SEARCH_SORT_FIELDS = {
   1: "Featured",
   2: "Popularity",
   3: "LastUpdated",
@@ -9,6 +9,6 @@ export const SORT_FIELD_NAMES = {
   8: "GameVersion",
 } as const;
 
-type T = typeof SORT_FIELD_NAMES;
+type T = typeof SEARCH_SORT_FIELDS;
 
-export type SortFieldName = T[keyof T];
+export type SearchSortField = T[keyof T];

@@ -1,9 +1,9 @@
-export const RELEASE_TYPE_NAMES = {
+export const RELEASE_TYPES = {
   1: "Release",
   2: "Beta",
   3: "Alpha",
 } as const;
 
-type T = typeof RELEASE_TYPE_NAMES;
+type T = typeof RELEASE_TYPES;
 
-export type ReleaseTypeName = T[keyof T];
+export type ReleaseType = T[keyof T];
