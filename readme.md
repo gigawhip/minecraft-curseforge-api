@@ -6,7 +6,7 @@ An ergonomic Deno wrapper around the NPM package [curseforge-api](https://github
 
 ## Usage Documentation
 
-Located in [/src/readme.md](/src/readme.md) so that it can be surfaced on the [deno.land/x/]("https://deno.land/x/minecraft_curseforge_api") page.
+Located in [/src/readme.md](/src/readme.md) so that it can be surfaced on the [deno.land/x/](https://deno.land/x/minecraft_curseforge_api) page.
 
 ## Local Development
 
