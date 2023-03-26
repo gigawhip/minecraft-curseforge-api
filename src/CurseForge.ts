@@ -15,6 +15,7 @@ import type { Mod } from "./mod/Mod.ts";
 import type { SearchModsOptions } from "./mod/searchMods.ts";
 import type { SearchSortField } from "./mod/sortField.ts";
 
+import { Cache } from "./Cache.ts";
 import { Dependencies } from "./file/Dependencies.ts";
 import { getFiles } from "./file/getFiles.ts";
 import { getNewestFile } from "./file/getNewestFile.ts";
@@ -40,29 +41,35 @@ export declare namespace CurseForge {
 
 export class CurseForge {
   #client: CurseForgeClient;
+  #cache: Cache;
 
   constructor(apiKey: string) {
     this.#client = new CurseForgeClient(apiKey);
+    this.#cache = new Cache();
   }
 
   async getMod(slugOrID: string | number) {
-    return await getMod(this.#client, slugOrID);
+    return await getMod(this.#client, this.#cache, slugOrID);
   }
 
   /** Find mods by full text search of mod name and author name. */
   async searchMods(query: string, options?: SearchModsOptions) {
-    return await searchMods(this.#client, query, options);
+    return await searchMods(this.#client, this.#cache, query, options);
   }
 
   async getFiles(modID: number, options?: GetFilesOptions) {
-    return await getFiles(this.#client, modID, options);
+    return await getFiles(this.#client, this.#cache, modID, options);
   }
 
   async getNewestFile(modID: number, options?: GetNewestFileOptions) {
-    return await getNewestFile(this.#client, modID, options);
+    return await getNewestFile(this.#client, this.#cache, modID, options);
   }
 
   dependencies(options: DependenciesOptions) {
-    return new Dependencies(this.#client, options);
+    return new Dependencies(this.#client, this.#cache, options);
+  }
+
+  clearCache() {
+    this.#cache = new Cache();
   }
 }

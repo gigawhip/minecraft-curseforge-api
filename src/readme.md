@@ -6,6 +6,7 @@ An ergonomic Deno wrapper around the NPM package [curseforge-api](https://github
 
 - [Getting Started](#getting-started)
 - [Type Definitions](#type-definitions)
+- [Cache](#cache)
 - [Complete Example](#complete-example)
 
 ## Getting Started
@@ -57,6 +58,21 @@ const curseForge = new CurseForge("YOUR_API_KEY");
 const modLoader: CurseForge.ModLoader = "Forge"; // easy access
 
 let file: CurseForge.File; // disambiguated from browser File API or other File types
+```
+
+## Cache
+
+API calls are cached in-memory to avoid duplicate lookups.
+
+```ts
+await curseForge.getMod("jei");
+await curseForge.getMod("jei"); // cached; doesn't make a network request
+```
+
+The cache is cleared when the `CurseForge` instance is garbage collected, or when the `clearCache()` method is called.
+
+```ts
+curseForge.clearCache();
 ```
 
 ## Complete Example
