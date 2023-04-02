@@ -3,6 +3,7 @@ import { CurseForgeClient } from "https://esm.sh/curseforge-api@1.0.2";
 import type { Category } from "./common/categories.ts";
 import type { MinecraftVersion } from "./common/minecraftVersion.ts";
 import type { ModLoader } from "./common/modLoader.ts";
+import type { VersionAndModLoader } from "./common/types.ts";
 import type {
   DependenciesOptions,
   DependencyGraphNode,
@@ -22,9 +23,12 @@ import { getNewestFile } from "./file/getNewestFile.ts";
 import { getMod } from "./mod/getMod.ts";
 import { searchMods } from "./mod/searchMods.ts";
 
+type CurseForgeDefaultOptions = VersionAndModLoader;
+
 export declare namespace CurseForge {
   export {
     Category,
+    CurseForgeDefaultOptions,
     DependenciesOptions,
     DependencyGraphNode,
     DependencyType,
@@ -42,10 +46,12 @@ export declare namespace CurseForge {
 export class CurseForge {
   #client: CurseForgeClient;
   #cache: Cache;
+  #defaultOptions: CurseForgeDefaultOptions;
 
-  constructor(apiKey: string) {
+  constructor(apiKey: string, defaultOptions: CurseForgeDefaultOptions = {}) {
     this.#client = new CurseForgeClient(apiKey);
     this.#cache = new Cache();
+    this.#defaultOptions = defaultOptions;
   }
 
   async getMod(slugOrID: string | number) {
@@ -54,19 +60,48 @@ export class CurseForge {
 
   /** Find mods by full text search of mod name and author name. */
   async searchMods(query: string, options?: SearchModsOptions) {
-    return await searchMods(this.#client, this.#cache, query, options);
+    const opts = Object.assign({}, this.#defaultOptions, options);
+
+    return await searchMods(this.#client, this.#cache, query, opts);
   }
 
   async getFiles(modID: number, options?: GetFilesOptions) {
-    return await getFiles(this.#client, this.#cache, modID, options);
+    const opts = Object.assign({}, this.#defaultOptions, options);
+
+    return await getFiles(this.#client, this.#cache, modID, opts);
   }
 
   async getNewestFile(modID: number, options?: GetNewestFileOptions) {
-    return await getNewestFile(this.#client, this.#cache, modID, options);
+    const opts = Object.assign({}, this.#defaultOptions, options);
+
+    return await getNewestFile(this.#client, this.#cache, modID, opts);
   }
 
-  dependencies(options: DependenciesOptions) {
-    return new Dependencies(this.#client, this.#cache, options);
+  dependencies(
+    file: File,
+    options: Partial<DependenciesOptions> = {},
+  ) {
+    options = Object.assign({}, this.#defaultOptions, options);
+
+    if (!options.minecraftVersion) {
+      throw new TypeError(
+        "Missing minecraftVersion. Pass it as a default option to CurseForge " +
+          "constructor or as an option to dependencies().",
+      );
+    }
+    if (!options.modLoader) {
+      throw new TypeError(
+        "Missing modLoader. Pass it as a default option to CurseForge " +
+          "constructor or as an option to dependencies().",
+      );
+    }
+
+    return new Dependencies(
+      this.#client,
+      this.#cache,
+      file,
+      options as DependenciesOptions,
+    );
   }
 
   clearCache() {

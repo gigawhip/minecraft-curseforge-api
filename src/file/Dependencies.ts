@@ -42,14 +42,12 @@ function getModIDs(
   return result;
 }
 
-type IncludeOrExclude =
-  | { include?: DependencyType[]; exclude?: never }
-  | { exclude?: DependencyType[]; include?: never };
-
 export type DependenciesOptions =
-  & VersionAndModLoader
-  & IncludeOrExclude
-  & { file: File };
+  & Required<VersionAndModLoader>
+  & (
+    | { include?: DependencyType[]; exclude?: never }
+    | { exclude?: DependencyType[]; include?: never }
+  );
 
 export type DependencyGraphNode = {
   file: File;
@@ -67,12 +65,11 @@ export class Dependencies {
   constructor(
     private curseForge: CurseForgeClient,
     private cache: Cache,
-    public readonly options: DependenciesOptions,
+    private file: File,
+    private options: DependenciesOptions,
   ) {
-    this.#inclusionFilter = makeInclusionFilter(
-      options.include,
-      options.exclude,
-    );
+    const { include, exclude } = options;
+    this.#inclusionFilter = makeInclusionFilter(include, exclude);
   }
 
   async toEntries() {
@@ -136,10 +133,7 @@ export class Dependencies {
   }
 
   async toGraph() {
-    const rootNode: DependencyGraphNode = {
-      file: this.options.file,
-      dependencies: {},
-    };
+    const rootNode: DependencyGraphNode = { file: this.file, dependencies: {} };
 
     const nodesByModID = await this.#graphNodesByModID(rootNode);
 
@@ -168,21 +162,14 @@ export class Dependencies {
 
   async *[Symbol.asyncIterator]() {
     const seen = new Set<number>();
-    const queue = getModIDs(this.options.file, this.#inclusionFilter);
+    const queue = getModIDs(this.file, this.#inclusionFilter);
+    const { cache, curseForge, options } = this;
 
     while (queue.length) {
       const modID = queue.shift()!;
       seen.add(modID);
 
-      const file = await getNewestFile(
-        this.curseForge,
-        this.cache,
-        modID,
-        {
-          minecraftVersion: this.options.minecraftVersion,
-          modLoader: this.options.modLoader,
-        },
-      );
+      const file = await getNewestFile(curseForge, cache, modID, options);
 
       yield { modID, file };
 
