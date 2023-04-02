@@ -27,7 +27,7 @@ if (!file) {
 
 const crawler = curseForge.dependencies(file);
 
-for await (const { modID, file } of crawler) {
+for await (const [modID, file] of crawler) {
   if (file === null) {
     console.log(
       `Couldn't find a file for mod with ID ${modID} (${minecraftVersion} ${modLoader})`,

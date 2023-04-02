@@ -58,6 +58,15 @@ export type DependencyGraphNode = {
   };
 };
 
+/**
+ * When `file` is `null`, a file could not be found matching the minecraft
+ * version and mod loader
+ */
+export type DependencyEntry = [
+  modID: number,
+  file: File | null,
+];
+
 export class Dependencies {
   #inclusionFilter: InclusionFilter;
 
@@ -73,10 +82,10 @@ export class Dependencies {
   }
 
   async toEntries() {
-    const entries: [number, File | null][] = [];
+    const entries: DependencyEntry[] = [];
 
-    for await (const { modID, file } of this) {
-      entries.push([modID, file]);
+    for await (const entry of this) {
+      entries.push(entry);
     }
 
     return entries;
@@ -85,7 +94,7 @@ export class Dependencies {
   async toObject() {
     const obj: Record<number, File | null> = {};
 
-    for await (const { modID, file } of this) {
+    for await (const [modID, file] of this) {
       obj[modID] = file;
     }
 
@@ -95,7 +104,7 @@ export class Dependencies {
   async toMap() {
     const map = new Map<number, File | null>();
 
-    for await (const { modID, file } of this) {
+    for await (const [modID, file] of this) {
       map.set(modID, file);
     }
 
@@ -105,7 +114,7 @@ export class Dependencies {
   async toFiles() {
     const files: File[] = [];
 
-    for await (const { file } of this) {
+    for await (const [_, file] of this) {
       if (file) files.push(file);
     }
 
@@ -171,7 +180,7 @@ export class Dependencies {
 
       const file = await getNewestFile(curseForge, cache, modID, options);
 
-      yield { modID, file };
+      yield [modID, file] as DependencyEntry;
 
       if (file) queue.push(...getModIDs(file, this.#inclusionFilter, seen));
     }

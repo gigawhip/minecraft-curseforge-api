@@ -41,6 +41,7 @@ export type { MinecraftVersion } from "./common/minecraftVersion.ts";
 export type { ModLoader } from "./common/modLoader.ts";
 export type {
   DependenciesOptions,
+  DependencyEntry,
   DependencyGraphNode,
 } from "./file/Dependencies.ts";
 export type { DependencyType } from "./file/dependencyType.ts";
