@@ -3,7 +3,7 @@
  *
  * @example
  * ```ts
- * import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.4.0/mod.ts";
+ * import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.5.0/mod.ts";
  *
  * const modLoader: CurseForge.ModLoader = "Forge";
  * const minecraftVersion: CurseForge.MinecraftVersion = "1.19.2";
