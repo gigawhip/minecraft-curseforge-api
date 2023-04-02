@@ -1,13 +1,11 @@
-import type {
-  CurseForgeClient,
-  CurseForgeMod,
-} from "https://esm.sh/curseforge-api@1.0.2";
+import type { CurseForgeClient } from "https://esm.sh/curseforge-api@1.0.2";
 
 import type { Cache } from "../Cache.ts";
 
 import { CLASSES } from "../common/categories.ts";
 import { GAME_ID } from "../common/constants.ts";
 import { mod } from "./Mod.ts";
+import { NotFoundError } from "../errors.ts";
 
 async function getModByID(
   curseForge: CurseForgeClient,
@@ -16,12 +14,10 @@ async function getModByID(
 ) {
   if (cache.mod[id]) return cache.mod[id];
 
-  const raw: undefined | CurseForgeMod = await curseForge.getMod(id);
-
-  const result = raw ? mod(raw) : null;
+  const result = mod(await curseForge.getMod(id));
 
   cache.mod[id] = result;
-  if (result) cache.mod[result.slug] = result;
+  cache.mod[result.slug] = result;
 
   return result;
 }
@@ -34,20 +30,27 @@ async function getModBySlug(
   if (cache.mod[slug]) return cache.mod[slug];
 
   const { data } = await curseForge
-    .searchMods(GAME_ID, {
-      slug,
-      classId: CLASSES.Mods,
-    });
+    .searchMods(GAME_ID, { slug, classId: CLASSES.Mods });
 
-  const result = data.length === 1 ? mod(data[0]) : null;
+  if (data.length === 0) {
+    throw new NotFoundError(`No mod found for slug: ${slug}`);
+  }
+
+  const result = mod(data[0]);
 
   cache.mod[slug] = result;
-  if (result) cache.mod[result.id] = result;
+  cache.mod[result.id] = result;
 
   return result;
 }
 
-/** @private Use CurseForge.getMod() instead. */
+/**
+ * @private Use CurseForge.getMod() instead.
+ *
+ * @throws {CurseForgeResponseError} when the request fails.
+ *
+ * @throws {NotFoundError} if the request succeeds but no mods are found.
+ */
 export async function getMod(
   curseForge: CurseForgeClient,
   cache: Cache,

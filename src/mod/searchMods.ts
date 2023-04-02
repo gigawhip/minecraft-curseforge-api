@@ -7,7 +7,7 @@ import {
 
 import type { Cache } from "../Cache.ts";
 import type { Pagination, VersionAndModLoader } from "../common/types.ts";
-import { SearchSortField } from "./sortField.ts";
+import type { SearchSortField } from "./sortField.ts";
 
 import { CLASSES, MOD_CATEGORIES, ModCategory } from "../common/categories.ts";
 import { GAME_ID } from "../common/constants.ts";
@@ -27,6 +27,8 @@ export type SearchModsOptions =
  * @private Use CurseForge.getMod() instead.
  *
  * Find mods by full text search of mod name and author name.
+ *
+ * @throws {CurseForgeResponseError} when the request fails.
  */
 export async function searchMods(
   curseForge: CurseForgeClient,
@@ -46,20 +48,19 @@ export async function searchMods(
     ...opts
   } = options;
 
-  const { pagination, data: _data } = await curseForge
-    .searchMods(
-      GAME_ID,
-      removeUndefinedProperties({
-        classId: CLASSES.Mods,
-        gameVersion: minecraftVersion,
-        categoryId: category && MOD_CATEGORIES[category],
-        modLoaderType: modLoader && CurseForgeModLoaderType[modLoader],
-        searchFilter: searchString,
-        sortField: sortField && CurseForgeModsSearchSortField[sortField],
-        sortOrder: sortOrder as CurseForgeSortOrder,
-        ...opts,
-      }),
-    );
+  const { pagination, data: _data } = await curseForge.searchMods(
+    GAME_ID,
+    removeUndefinedProperties({
+      classId: CLASSES.Mods,
+      gameVersion: minecraftVersion,
+      categoryId: category && MOD_CATEGORIES[category],
+      modLoaderType: modLoader && CurseForgeModLoaderType[modLoader],
+      searchFilter: searchString,
+      sortField: sortField && CurseForgeModsSearchSortField[sortField],
+      sortOrder: sortOrder as CurseForgeSortOrder,
+      ...opts,
+    }),
+  );
 
   const result = { pagination, data: _data.map(mod) };
 

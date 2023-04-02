@@ -6,6 +6,7 @@ An ergonomic Deno wrapper around the NPM package [curseforge-api](https://github
 
 - [Getting Started](#getting-started)
 - [Type Definitions](#type-definitions)
+- [Errors](#errors)
 - [Cache](#cache)
 - [Complete Example](#complete-example)
 
@@ -62,6 +63,45 @@ const modLoader: CurseForge.ModLoader = "Forge"; // easy access
 let file: CurseForge.File; // disambiguated from browser File API or other File types
 ```
 
+## Errors
+
+Errors are thrown in the following circumstances:
+
+- A `CurseForgeResponseError` is thrown when an error happens while fetching data.
+
+- A `NotFoundError` is thrown when a mod or file is not found by `CurseForge.prototype.getMod()` or `CurseForge.prototype.getNewestFile()`.
+
+- A `TypeError` is thrown when `CurseForge.prototype.dependencies()` is called without a minecraft version or mod loader registered.
+
+The custom errors are exported from both `mod.ts` and the `CurseForge` namespace for convenience:
+
+```ts
+import {
+  CurseForge,
+  NotFoundError,
+} from "https://deno.land/x/minecraft_curseforge_api@0.5.0/mod.ts";
+
+CurseForge.errors.NotFound; // mirrors Deno.errors API
+
+CurseForge.errors.NotFound === NotFoundError; // true
+```
+
+Example usage:
+
+```ts
+import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.5.0/mod.ts";
+
+new CurseForge("YOUR_API_KEY")
+  .getMod("definitely not a mod,.,.,.,.,.")
+  .catch((error) => {
+    if (error instanceof CurseForge.errors.NotFound) {
+      console.log("Mod not found!");
+    } else {
+      console.log("Something else went wrong!");
+    }
+  });
+```
+
 ## Cache
 
 API calls are cached in-memory to avoid duplicate lookups.
@@ -86,24 +126,12 @@ import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.5.0/m
 
 const modLoader: CurseForge.ModLoader = "Forge";
 const minecraftVersion: CurseForge.MinecraftVersion = "1.19.2";
+
 const curseForge = new CurseForge(API_KEY, { minecraftVersion, modLoader });
-
 const mod = await curseForge.getMod("quark");
-
-if (!mod) {
-  console.log("Couldn't find a mod with that slug!");
-  Deno.exit(1);
-}
-
 const file = await curseForge.getNewestFile(mod.id);
 
-if (!file) {
-  console.log("Couldn't find a file for this mod loader and MC version!");
-  Deno.exit(1);
-}
-
-curseForge
-  .dependencies(file, { include: ["required"] })
+curseForge.dependencies(file, { include: ["required"] })
   .toFiles()
   .then((depFiles) =>
     depFiles.forEach((depFile) => console.log(depFile.displayName))

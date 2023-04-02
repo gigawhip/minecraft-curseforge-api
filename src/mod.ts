@@ -7,24 +7,12 @@
  *
  * const modLoader: CurseForge.ModLoader = "Forge";
  * const minecraftVersion: CurseForge.MinecraftVersion = "1.19.2";
+ *
  * const curseForge = new CurseForge(API_KEY, { minecraftVersion, modLoader });
- *
  * const mod = await curseForge.getMod("quark");
- *
- * if (!mod) {
- *   console.log("Couldn't find a mod with that slug!");
- *   Deno.exit(1);
- * }
- *
  * const file = await curseForge.getNewestFile(mod.id);
  *
- * if (!file) {
- *   console.log("Couldn't find a file for this mod loader and MC version!");
- *   Deno.exit(1);
- * }
- *
- * curseForge
- *   .dependencies(file, { include: ["required"] })
+ * curseForge.dependencies(file, { include: ["required"] })
  *   .toFiles()
  *   .then((depFiles) =>
  *     depFiles.forEach((depFile) => console.log(depFile.displayName))
@@ -35,6 +23,7 @@
  */
 
 export { CurseForge } from "./CurseForge.ts";
+export * from "./errors.ts";
 
 export type { Category } from "./common/categories.ts";
 export type { MinecraftVersion } from "./common/minecraftVersion.ts";

@@ -8,26 +8,12 @@ const minecraftVersion = "1.19.2";
 const modLoader = "Forge";
 const options = { minecraftVersion, modLoader } as const;
 
-const curseForge = await new CurseForge(API_KEY, options);
+const curseForge = new CurseForge(API_KEY, options);
 const mod = await curseForge.getMod(SLUG);
-
-if (!mod) {
-  console.log(`Couldn't find a mod with slug "${SLUG}"`);
-  Deno.exit(1);
-}
-
 const file = await curseForge.getNewestFile(mod.id);
+const dependencies = curseForge.dependencies(file);
 
-if (!file) {
-  console.log(
-    `Couldn't find a file for ${mod.name}} (${minecraftVersion} ${modLoader})`,
-  );
-  Deno.exit(1);
-}
-
-const crawler = curseForge.dependencies(file);
-
-for await (const [modID, file] of crawler) {
+for await (const [modID, file] of dependencies) {
   if (file === null) {
     console.log(
       `Couldn't find a file for mod with ID ${modID} (${minecraftVersion} ${modLoader})`,
