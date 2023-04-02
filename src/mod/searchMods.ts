@@ -62,9 +62,5 @@ export async function searchMods(
     }),
   );
 
-  const result = { pagination, data: _data.map(mod) };
-
-  cache.mods[query] = result;
-
-  return result;
+  return cache.set("mods", query, { pagination, data: _data.map(mod) });
 }

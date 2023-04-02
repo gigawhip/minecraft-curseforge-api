@@ -37,9 +37,5 @@ export async function getFiles(
     }),
   );
 
-  const result = { pagination, data: _data.map(file) };
-
-  cache.files[query] = result;
-
-  return result;
+  return cache.set("files", query, { pagination, data: _data.map(file) });
 }

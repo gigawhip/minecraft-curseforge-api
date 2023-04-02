@@ -16,10 +16,7 @@ async function getModByID(
 
   const result = mod(await curseForge.getMod(id));
 
-  cache.mod[id] = result;
-  cache.mod[result.slug] = result;
-
-  return result;
+  return cache.set("mod", result.slug, result);
 }
 
 async function getModBySlug(
@@ -36,12 +33,7 @@ async function getModBySlug(
     throw new NotFoundError(`No mod found for slug: ${slug}`);
   }
 
-  const result = mod(data[0]);
-
-  cache.mod[slug] = result;
-  cache.mod[result.id] = result;
-
-  return result;
+  return cache.set("mod", slug, mod(data[0]));
 }
 
 /**

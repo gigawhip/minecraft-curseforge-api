@@ -30,9 +30,5 @@ export async function getNewestFile(
     throw new NotFoundError(`No files found for query: ${query}`);
   }
 
-  const result = data[0];
-
-  cache.newestFile[query] = result;
-
-  return result;
+  return cache.set("newestFile", query, data[0]);
 }

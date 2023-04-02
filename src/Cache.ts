@@ -27,4 +27,20 @@ export class Cache {
 
     return query;
   }
+
+  set<Category extends "files" | "newestFile" | "mod" | "mods">(
+    this: Cache,
+    category: Category,
+    key: string,
+    value: Cache[Category][keyof Cache[Category]],
+  ) {
+    this[category][key] = value;
+
+    if (category === "mod") {
+      const mod = value as Mod;
+      this.mod[mod.id] = mod;
+    }
+
+    return value;
+  }
 }
