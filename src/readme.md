@@ -16,17 +16,16 @@ In a Deno project:
 ```ts
 import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.4.0/mod.ts";
 
-const curseForge = new CurseForge("YOUR_API_KEY");
+const curseForge = new CurseForge("YOUR_API_KEY", defaultOptions);
 
 await curseForge.getMod(slugOrID);
 await curseForge.searchMods(nameOrAuthor, options);
 await curseForge.getFiles(modID, options);
 await curseForge.getNewestFile(modID, options);
 
-const dependencies = curseForge
-  .dependencies({ file, minecraftVersion, modLoader, ...options });
+const dependencies = curseForge.dependencies(file, options);
 
-for await (const dependency of curseForge.dependencies({ file, ...options })) {
+for await (const dependency of dependencies) {
   // do something with dependency
 }
 
@@ -83,11 +82,11 @@ curseForge.clearCache();
 In this example, we get the popular mod [Quark](https://www.curseforge.com/minecraft/mc-mods/quark), find its newest file for our targeted Minecraft version and mod loader, then fetch all of its required dependencies. At each stage we check to ensure that the previous operation was successful before proceeding - in this exact example it's not necessary, but if you copy this script and modify the mod slug, mod loader, or minecraft version, these checks will save you!
 
 ```ts
-import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.4.0/mod.ts";
+import { CurseForge } from "https://deno.land/x/minecraft_curseforge_api@0.5.0/mod.ts";
 
-const curseForge = new CurseForge("YOUR_API_KEY");
 const modLoader: CurseForge.ModLoader = "Forge";
 const minecraftVersion: CurseForge.MinecraftVersion = "1.19.2";
+const curseForge = new CurseForge(API_KEY, { minecraftVersion, modLoader });
 
 const mod = await curseForge.getMod("quark");
 
@@ -96,8 +95,7 @@ if (!mod) {
   Deno.exit(1);
 }
 
-const file = await curseForge
-  .getNewestFile(mod.id, { minecraftVersion, modLoader });
+const file = await curseForge.getNewestFile(mod.id);
 
 if (!file) {
   console.log("Couldn't find a file for this mod loader and MC version!");
@@ -105,7 +103,7 @@ if (!file) {
 }
 
 curseForge
-  .dependencies({ file, minecraftVersion, modLoader, include: ["required"] })
+  .dependencies(file, { include: ["required"] })
   .toFiles()
   .then((depFiles) =>
     depFiles.forEach((depFile) => console.log(depFile.displayName))
