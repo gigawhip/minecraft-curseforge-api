@@ -178,7 +178,8 @@ export class Dependencies {
       const modID = queue.shift()!;
       seen.add(modID);
 
-      const file = await getNewestFile(curseForge, cache, modID, options);
+      const file = await getNewestFile(curseForge, cache, modID, options)
+        .catch(() => null);
 
       yield [modID, file] as DependencyEntry;
 

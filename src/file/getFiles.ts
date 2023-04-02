@@ -11,7 +11,11 @@ import { file } from "./File.ts";
 
 export type GetFilesOptions = Pagination & VersionAndModLoader;
 
-/** @private Use CurseForge.getFiles() instead. */
+/**
+ * @private Use CurseForge.getFiles() instead.
+ *
+ * @throws {CurseForgeResponseError} when the request fails.
+ */
 export async function getFiles(
   curseForge: CurseForgeClient,
   cache: Cache,

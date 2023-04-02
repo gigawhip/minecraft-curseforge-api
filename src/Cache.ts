@@ -8,8 +8,8 @@ import type { SearchModsOptions } from "./mod/searchMods.ts";
 
 export class Cache {
   files: { [QueryString: string]: CurseForgePaginatedResponse<File> } = {};
-  newestFile: { [QueryString: string]: File | null } = {};
-  mod: { [SlugOrID: string | number]: Mod | null } = {};
+  newestFile: { [QueryString: string]: File } = {};
+  mod: { [SlugOrID: string | number]: Mod } = {};
   mods: { [QueryString: string]: CurseForgePaginatedResponse<Mod> } = {};
 
   constructor() {}
