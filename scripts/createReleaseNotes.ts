@@ -55,7 +55,7 @@ function asListItem(
   markdown += `${subject} (${hash})`;
 
   if (body) {
-    markdown += `\n\n  ${body}`;
+    markdown += `\n\n${body.replaceAll("\n", "\n\n").replaceAll(/^/gm, "  ")}`;
   }
 
   return markdown;
@@ -73,14 +73,22 @@ const fixes = commitDescriptions
   .filter(({ type }) => type === "fix")
   .sort((a) => a.breakingChange ? -1 : 1);
 
-const markdown = `## Features
+let markdown = "";
+
+if (features.length) {
+  markdown += `## Features
 
 ${asUnorderedList(features)}
 
-## Fixes
+`;
+}
+
+if (fixes.length) {
+  markdown += `## Fixes
 
 ${asUnorderedList(fixes)}
 `;
+}
 
 clipboard.writeText(markdown);
 console.log(`Release notes copied to clipboard.`);
