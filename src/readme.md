@@ -25,7 +25,7 @@ await curseForge.getNewestFile(modID, options);
 
 const dependencies = curseForge.dependencies(file, options);
 
-for await (const dependency of dependencies) {
+for await (const [modID, file] of dependencies) {
   // do something with dependency
 }
 

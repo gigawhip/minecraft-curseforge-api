@@ -29,7 +29,7 @@ const dependencies = curseForge.dependencies(file);
 
 // async iterable
 console.log("iterating over dependencies:");
-for await (const { file } of dependencies) {
+for await (const [_, file] of dependencies) {
   console.log(file && file.displayName);
 }
 console.log();

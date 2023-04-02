@@ -6,6 +6,7 @@ import type { ModLoader } from "./common/modLoader.ts";
 import type { VersionAndModLoader } from "./common/types.ts";
 import type {
   DependenciesOptions,
+  DependencyEntry,
   DependencyGraphNode,
 } from "./file/Dependencies.ts";
 import type { DependencyType } from "./file/dependencyType.ts";
@@ -30,6 +31,7 @@ export declare namespace CurseForge {
     Category,
     CurseForgeDefaultOptions,
     DependenciesOptions,
+    DependencyEntry,
     DependencyGraphNode,
     DependencyType,
     File,
